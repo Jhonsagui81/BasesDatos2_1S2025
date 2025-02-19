@@ -1,4 +1,4 @@
-/** Entidad Roles **/
+/** ENTIDAD Roles **/
 CREATE TRIGGER trg_Roles_Insert
 ON practica1.Roles
 AFTER INSERT
@@ -11,8 +11,7 @@ END;
 GO
 
 
-/** Ent
-idad Course **/
+/** ENTIDAD Course **/
 CREATE TRIGGER trg_Course_Insert
 ON practica1.Course
 AFTER INSERT
@@ -25,7 +24,7 @@ END;
 GO
 
 
-/** Entidad ProfileStudent **/
+/** ENTIDAD ProfileStudent **/
 CREATE TRIGGER trg_ProfileStudent_Insert
 ON practica1.ProfileStudent
 AFTER INSERT
@@ -38,7 +37,7 @@ END;
 GO
 
 
-/** Entidad Notification **/
+/** ENTIDAD Notification **/
 CREATE TRIGGER trg_Notification_Insert
 ON practica1.Notification
 AFTER INSERT
@@ -51,7 +50,7 @@ BEGIN
 END
 GO
 
-/** Entidad TFA **/
+/** ENTIDAD TFA **/
 CREATE TRIGGER trg_TFA_Insert
 ON practica1.TFA
 AFTER INSERT
@@ -63,61 +62,61 @@ BEGIN
 END
 GO
 
-/** Entidad TutorProfile **/
+/** ENTIDAD TutorProfile **/
 CREATE TRIGGER trg_TutorProfile_Insert
-ON [practica1].[TutorProfile]
+ON practica1.TutorProfile
 AFTER INSERT
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[TutorProfile inserted] Id:' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', TutorCode: ' + TutorCode
     FROM inserted;
 END
 GO
 
-/** Entidad UsuarioRole **/
+/** ENTIDAD UsuarioRole **/
 CREATE TRIGGER trg_UsuarioRole_Insert
-ON [practica1].[UsuarioRole]
+ON practica1.UsuarioRole
 AFTER INSERT
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[UsuarioRole inserted] Id:' + CAST(Id AS NVARCHAR) + ', RoleId: ' + CAST(RoleId AS NVARCHAR(36)) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', IsLatestVersion: ' + CAST(IsLatestVersion AS NVARCHAR)
     FROM inserted;
 END
 GO
 
-/** Entidad Usuarios **/
+/** ENTIDAD Usuarios **/
 CREATE TRIGGER trg_Usuarios_Insert
-ON [practica1].[Usuarios]
+ON practica1.Usuarios
 AFTER INSERT
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[Usuarios inserted] Id:' + CAST(Id AS NVARCHAR(36)) + ', Firstname: ' + Firstname + ', Lastname: ' + Lastname + ', Email: ' + Email + ', DateOfBirth: ' + CAST(DateOfBirth AS NVARCHAR) + ', LastChanges: ' + CAST(LastChanges AS NVARCHAR) + ', EmailConfirmed: ' + CAST(EmailConfirmed AS NVARCHAR)
     FROM inserted;
 END
 GO
 
-/** Entidad CourseAssignment **/
+/** ENTIDAD CourseAssignment **/
 CREATE TRIGGER trg_CourseAssignment_Insert
-ON [practica1].[CourseAssignment]
+ON practica1.CourseAssignment
 AFTER INSERT
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[CourseAssignment inserted] Id:' + CAST(Id AS NVARCHAR) + ', StudentId: ' + CAST(StudentId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(CourseCodCourse AS NVARCHAR)
     FROM inserted;
 END
 GO
 
-/** Entidad CourseTutor **/
+/** ENTIDAD CourseTutor **/
 CREATE TRIGGER trg_CourseTutor_Insert
-ON [practica1].[CourseTutor]
+ON practica1.CourseTutor
 AFTER INSERT
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[CourseTutor inserted] Id:' + CAST(Id AS NVARCHAR) + ', TutorId: ' + CAST(TutorId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(CourseCodCourse AS NVARCHAR)
     FROM inserted;
 END

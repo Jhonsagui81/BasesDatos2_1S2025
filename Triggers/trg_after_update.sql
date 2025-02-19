@@ -138,7 +138,7 @@ BEGIN
 END;
 GO
 
-/*** ENTIDAD USUARIOS ***/  REVISAR
+/*** ENTIDAD USUARIOS ***/ 
 CREATE TRIGGER trg_Usuarios_Update
 ON practica1.Usuarios
 AFTER UPDATE
@@ -155,6 +155,7 @@ BEGIN
         CASE WHEN i.DateOfBirth <> d.DateOfBirth THEN 'DateOfBirth actualizado de ' + CAST(d.DateOfBirth AS NVARCHAR) + ' a ' + CAST(i.DateOfBirth AS NVARCHAR) + '. ' ELSE '' END +
         CASE WHEN i.LastChanges <> d.LastChanges THEN 'LastChanges actualizado de ' + CAST(d.LastChanges AS NVARCHAR) + ' a ' + CAST(i.LastChanges AS NVARCHAR) + '. ' ELSE '' END +
         CASE WHEN i.EmailConfirmed <> d.EmailConfirmed THEN 'EmailConfirmed actualizado de ' + CAST(d.EmailConfirmed AS NVARCHAR) + ' a ' + CAST(i.EmailConfirmed AS NVARCHAR) + '. ' ELSE '' END
+        CASE WHEN i.Password <> d.Password THEN 'Se editó la contraseña. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
     WHERE i.Firstname <> d.Firstname 
@@ -162,7 +163,8 @@ BEGIN
        OR i.Email <> d.Email
        OR i.DateOfBirth <> d.DateOfBirth
        OR i.LastChanges <> d.LastChanges
-       OR i.EmailConfirmed <> d.EmailConfirmed; 
+       OR i.EmailConfirmed <> d.EmailConfirmed
+       OR i.Password <> d.Password;
 END;
 GO
 

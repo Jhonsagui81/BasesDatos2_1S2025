@@ -61,11 +61,11 @@ GO
 
 /** Entidad TutorProfile **/
 CREATE TRIGGER trg_TutorProfile_Delete
-ON [practica1].[TutorProfile]
+ON practica1.TutorProfile
 AFTER DELETE
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[TutorProfile deleted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', TutorCode: ' + TutorCode
     FROM deleted;
 END
@@ -73,11 +73,11 @@ GO
 
 /** Entidad UsuarioRole **/
 CREATE TRIGGER trg_UsuarioRole_Delete
-ON [practica1].[UsuarioRole]
+ON practica1.UsuarioRole
 AFTER DELETE
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[UsuarioRole deleted] Id: ' + CAST(Id AS NVARCHAR) + ', RoleId: ' + CAST(RoleId AS NVARCHAR(36)) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', IsLatestVersion: ' + CAST(IsLatestVersion AS NVARCHAR)
     FROM deleted;
 END
@@ -85,11 +85,11 @@ GO
 
 /** Entidad Usuarios **/
 CREATE TRIGGER trg_Usuarios_Delete
-ON [practica1].[Usuarios]
+ON practica1.Usuarios
 AFTER DELETE
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[Usuarios deleted] Id: ' + CAST(Id AS NVARCHAR(36)) + ', Firstname: ' + Firstname + ', Lastname: ' + Lastname + ', Email: ' + Email + ', DateOfBirth: ' + CAST(DateOfBirth AS NVARCHAR) + ', LastChanges: ' + CAST(LastChanges AS NVARCHAR) + ', EmailConfirmed: ' + CAST(EmailConfirmed AS NVARCHAR)
     FROM deleted;
 END
@@ -97,11 +97,11 @@ GO
 
 /** Entidad CourseAssignment **/
 CREATE TRIGGER trg_CourseAssignment_Delete
-ON [practica1].[CourseAssignment]
+ON practica1.CourseAssignment
 AFTER DELETE
 AS
 BEGIN
-    INSERT INTO [practica1].[HistoryLog] (Date, Description)
+    INSERT INTO practica1.HistoryLog (Date, Description)
     SELECT GETDATE(), '[CourseAssignment deleted] Id: ' + CAST(Id AS NVARCHAR) + ', StudentId: ' + CAST(StudentId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(CourseCodCourse AS NVARCHAR)
     FROM deleted;
 END
