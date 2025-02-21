@@ -63,3 +63,11 @@ EXEC [practica1].[PR1]
     @Password = 'password123',
     @Credits = 100;
 GO
+
+
+USE BD2;
+SELECT * FROM [practica1].[Usuarios];
+
+
+
+
