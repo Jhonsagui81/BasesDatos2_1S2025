@@ -567,4 +567,457 @@ GO
 
 
 ---------------------------------------------TRIGERS------------------------------------------
-    
+
+
+/** ENTIDAD Roles **/
+CREATE TRIGGER trgRolesInsert
+ON practica1.Roles
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Rol inserted] Id: ' + CAST(Id AS NVARCHAR(36)) + ', RoleName: ' + RoleName
+    FROM inserted;
+END;
+GO
+
+
+/** ENTIDAD Course **/
+CREATE TRIGGER trgCourseInsert
+ON practica1.Course
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Course inserted] CodCourse: ' + CAST(CodCourse AS NVARCHAR) + ', Name: ' + Name + ', Credits Required: ' + CAST(CreditsRequired AS NVARCHAR)
+    FROM inserted;
+END;
+GO
+
+
+/** ENTIDAD ProfileStudent **/
+CREATE TRIGGER trgProfileStudentInsert
+ON practica1.ProfileStudent
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[ProfileStudent inserted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', Credits: ' + CAST(Credits AS NVARCHAR)
+    FROM inserted;
+END;
+GO
+
+
+/** ENTIDAD Notification **/
+CREATE TRIGGER trgNotificationInsert
+ON practica1.Notification
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Notification inserted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', Message: ' + Message
+    FROM inserted;
+END
+GO
+
+/** ENTIDAD TFA **/
+CREATE TRIGGER trgTFAInsert
+ON practica1.TFA
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[TFA inserted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', Status: ' + CAST(Status AS NVARCHAR) + ', LastUpdate: ' + CAST(LastUpdate AS NVARCHAR)
+    FROM inserted;
+END
+GO
+
+/** ENTIDAD TutorProfile **/
+CREATE TRIGGER trgTutorProfileInsert
+ON practica1.TutorProfile
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[TutorProfile inserted] Id:' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', TutorCode: ' + TutorCode
+    FROM inserted;
+END
+GO
+
+/** ENTIDAD UsuarioRole **/
+CREATE TRIGGER trgUsuarioRoleInsert
+ON practica1.UsuarioRole
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[UsuarioRole inserted] Id:' + CAST(Id AS NVARCHAR) + ', RoleId: ' + CAST(RoleId AS NVARCHAR(36)) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', IsLatestVersion: ' + CAST(IsLatestVersion AS NVARCHAR)
+    FROM inserted;
+END
+GO
+
+/** ENTIDAD Usuarios **/
+CREATE TRIGGER trgUsuariosInsert
+ON practica1.Usuarios
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Usuarios inserted] Id:' + CAST(Id AS NVARCHAR(36)) + ', Firstname: ' + Firstname + ', Lastname: ' + Lastname + ', Email: ' + Email + ', DateOfBirth: ' + CAST(DateOfBirth AS NVARCHAR) + ', LastChanges: ' + CAST(LastChanges AS NVARCHAR) + ', EmailConfirmed: ' + CAST(EmailConfirmed AS NVARCHAR)
+    FROM inserted;
+END
+GO
+
+/** ENTIDAD CourseAssignment **/
+CREATE TRIGGER trgCourseAssignmentInsert
+ON practica1.CourseAssignment
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[CourseAssignment inserted] Id:' + CAST(Id AS NVARCHAR) + ', StudentId: ' + CAST(StudentId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(CourseCodCourse AS NVARCHAR)
+    FROM inserted;
+END
+GO
+
+/** ENTIDAD CourseTutor **/
+CREATE TRIGGER trgCourseTutorInsert
+ON practica1.CourseTutor
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[CourseTutor inserted] Id:' + CAST(Id AS NVARCHAR) + ', TutorId: ' + CAST(TutorId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(CourseCodCourse AS NVARCHAR)
+    FROM inserted;
+END
+GO
+
+
+/** Entidad Roles **/
+CREATE TRIGGER trgRolesDelete
+ON practica1.Roles
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Rol deleted] Id: ' + CAST(Id AS NVARCHAR(36)) + ', RoleName: ' + RoleName
+    FROM deleted;
+END;
+GO
+
+/** Entidad Course **/
+CREATE TRIGGER trgCourseDelete
+ON practica1.Course
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Course deleted] CodCourse: ' + CAST(CodCourse AS NVARCHAR) + ', Name: ' + Name + ', Credits Required: ' + CAST(CreditsRequired AS NVARCHAR)
+    FROM deleted;
+END;
+GO
+
+/** Entidad ProfileStudent **/
+CREATE TRIGGER trgProfileStudentDelete
+ON practica1.ProfileStudent
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[ProfileStudent deleted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', Credits: ' + CAST(Credits AS NVARCHAR)
+    FROM deleted;
+END;
+GO
+
+/** Entidad Notification **/
+CREATE TRIGGER trgNotificationDelete
+ON practica1.Notification
+AFTER DELETE
+AS
+BEGIN
+    SET NOCOUNT ON;
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Notification deleted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', Message: ' + Message
+    FROM deleted;
+END
+GO
+
+/** Entidad TFA **/
+CREATE TRIGGER trgTFADelete
+ON practica1.TFA
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[TFA deleted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', Status: ' + CAST(Status AS NVARCHAR) + ', LastUpdate: ' + CAST(LastUpdate AS NVARCHAR)
+    FROM deleted;
+END
+GO
+
+/** Entidad TutorProfile **/
+CREATE TRIGGER trgTutorProfileDelete
+ON practica1.TutorProfile
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[TutorProfile deleted] Id: ' + CAST(Id AS NVARCHAR) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', TutorCode: ' + TutorCode
+    FROM deleted;
+END
+GO
+
+/** Entidad UsuarioRole **/
+CREATE TRIGGER trgUsuarioRoleDelete
+ON practica1.UsuarioRole
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[UsuarioRole deleted] Id: ' + CAST(Id AS NVARCHAR) + ', RoleId: ' + CAST(RoleId AS NVARCHAR(36)) + ', UserId: ' + CAST(UserId AS NVARCHAR(36)) + ', IsLatestVersion: ' + CAST(IsLatestVersion AS NVARCHAR)
+    FROM deleted;
+END
+GO
+
+/** Entidad Usuarios **/
+CREATE TRIGGER trgUsuariosDelete
+ON practica1.Usuarios
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[Usuarios deleted] Id: ' + CAST(Id AS NVARCHAR(36)) + ', Firstname: ' + Firstname + ', Lastname: ' + Lastname + ', Email: ' + Email + ', DateOfBirth: ' + CAST(DateOfBirth AS NVARCHAR) + ', LastChanges: ' + CAST(LastChanges AS NVARCHAR) + ', EmailConfirmed: ' + CAST(EmailConfirmed AS NVARCHAR)
+    FROM deleted;
+END
+GO
+
+/** Entidad CourseAssignment **/
+CREATE TRIGGER trgCourseAssignmentDelete
+ON practica1.CourseAssignment
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT GETDATE(), '[CourseAssignment deleted] Id: ' + CAST(Id AS NVARCHAR) + ', StudentId: ' + CAST(StudentId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(CourseCodCourse AS NVARCHAR)
+    FROM deleted;
+END
+GO
+
+/** Entidad CourseTutor **/
+CREATE TRIGGER trgCourseTutorDelete
+ON practica1.CourseTutor
+AFTER DELETE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), '[CourseTutor deleted] Id: ' + CAST(d.Id AS NVARCHAR) + ', TutorId: ' + CAST(d.TutorId AS NVARCHAR(36)) + ', CourseCodCourse: ' + CAST(d.CourseCodCourse AS NVARCHAR)
+    FROM deleted d;
+END;
+GO
+
+/*** ENTIDAD ROLES ***/
+
+CREATE TRIGGER trgRolesUpdate
+ON practica1.Roles
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[Rol updated] Id: ' + CAST(i.Id AS NVARCHAR(36)) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.RoleName <> d.RoleName THEN 'RoleName actualizado de ' + d.RoleName + ' a ' + i.RoleName + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.RoleName <> d.RoleName;
+END;
+GO
+
+
+/*** ENTIDAD COURSE ***/
+CREATE TRIGGER trgCourseUpdate
+ON practica1.Course
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[Course updated] CodCourse: ' + CAST(i.CodCourse AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.Name <> d.Name THEN 'Name actualizado de ' + d.Name + ' a ' + i.Name + '. ' ELSE '' END +
+        CASE WHEN i.CreditsRequired <> d.CreditsRequired THEN 'CreditsRequired actualizado de ' + CAST(d.CreditsRequired AS NVARCHAR) + ' a ' + CAST(i.CreditsRequired AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.CodCourse = d.CodCourse
+    WHERE i.Name <> d.Name OR i.CreditsRequired <> d.CreditsRequired; 
+END;
+GO
+
+
+/*** ENTIDAD PROFILE STUDENT ***/
+CREATE TRIGGER trgProfileStudentUpdate
+ON practica1.ProfileStudent
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[ProfileStudent updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.UserId <> d.UserId THEN 'UserId actualizado de ' + CAST(d.UserId AS NVARCHAR(36)) + ' a ' + CAST(i.UserId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.Credits <> d.Credits THEN 'Credits actualizado de ' + CAST(d.Credits AS NVARCHAR) + ' a ' + CAST(i.Credits AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.UserId <> d.UserId OR i.Credits <> d.Credits; 
+END;
+GO
+
+/*** ENTIDAD NOTIFICATION ***/
+CREATE TRIGGER trgNotificationUpdate
+ON practica1.Notification
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[Notification updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.UserId <> d.UserId THEN 'UserId actualizado de ' + CAST(d.UserId AS NVARCHAR(36)) + ' a ' + CAST(i.UserId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.Message <> d.Message THEN 'Message actualizado de "' + d.Message + '" a "' + i.Message + '". ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.UserId <> d.UserId OR i.Message <> d.Message;
+END;
+GO
+
+
+/*** ENTIDAD TFA ***/
+CREATE TRIGGER trgTFAUpdate
+ON practica1.TFA
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[TFA updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.UserId <> d.UserId THEN 'UserId actualizado de ' + CAST(d.UserId AS NVARCHAR(36)) + ' a ' + CAST(i.UserId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.Status <> d.Status THEN 'Status actualizado de ' + CAST(d.Status AS NVARCHAR) + ' a ' + CAST(i.Status AS NVARCHAR) + '. ' ELSE '' END +
+        CASE WHEN i.LastUpdate <> d.LastUpdate THEN 'LastUpdate actualizado de ' + CAST(d.LastUpdate AS NVARCHAR) + ' a ' + CAST(i.LastUpdate AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.UserId <> d.UserId OR i.Status <> d.Status OR i.LastUpdate <> d.LastUpdate;
+END;
+GO
+
+
+/*** ENTIDAD TUTOR PROFILE ***/
+CREATE TRIGGER trgTutorProfileUpdate
+ON practica1.TutorProfile
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[TutorProfile updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.UserId <> d.UserId THEN 'UserId actualizado de ' + CAST(d.UserId AS NVARCHAR(36)) + ' a ' + CAST(i.UserId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.TutorCode <> d.TutorCode THEN 'TutorCode actualizado de ' + d.TutorCode + ' a ' + i.TutorCode + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.UserId <> d.UserId OR i.TutorCode <> d.TutorCode;
+END;
+GO
+
+
+/*** ENTIDAD USUARIO ROLE ***/
+CREATE TRIGGER trgUsuarioRoleUpdate
+ON practica1.UsuarioRole
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[UsuarioRole updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.RoleId <> d.RoleId THEN 'RoleId actualizado de ' + CAST(d.RoleId AS NVARCHAR(36)) + ' a ' + CAST(i.RoleId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.UserId <> d.UserId THEN 'UserId actualizado de ' + CAST(d.UserId AS NVARCHAR(36)) + ' a ' + CAST(i.UserId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.IsLatestVersion <> d.IsLatestVersion THEN 'IsLatestVersion actualizado de ' + CAST(d.IsLatestVersion AS NVARCHAR) + ' a ' + CAST(i.IsLatestVersion AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.RoleId <> d.RoleId OR i.UserId <> d.UserId OR i.IsLatestVersion <> d.IsLatestVersion;
+END;
+GO
+
+/*** ENTIDAD USUARIOS ***/ 
+CREATE TRIGGER trgUsuariosUpdate
+ON practica1.Usuarios
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[Usuarios updated] Id: ' + CAST(i.Id AS NVARCHAR(36)) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.Firstname <> d.Firstname THEN 'Firstname actualizado de ' + d.Firstname + ' a ' + i.Firstname + '. ' ELSE '' END +
+        CASE WHEN i.Lastname <> d.Lastname THEN 'Lastname actualizado de ' + d.Lastname + ' a ' + i.Lastname + '. ' ELSE '' END +
+        CASE WHEN i.Email <> d.Email THEN 'Email actualizado de ' + d.Email + ' a ' + i.Email + '. ' ELSE '' END +
+        CASE WHEN i.DateOfBirth <> d.DateOfBirth THEN 'DateOfBirth actualizado de ' + CAST(d.DateOfBirth AS NVARCHAR) + ' a ' + CAST(i.DateOfBirth AS NVARCHAR) + '. ' ELSE '' END +
+        CASE WHEN i.LastChanges <> d.LastChanges THEN 'LastChanges actualizado de ' + CAST(d.LastChanges AS NVARCHAR) + ' a ' + CAST(i.LastChanges AS NVARCHAR) + '. ' ELSE '' END +
+        CASE WHEN i.EmailConfirmed <> d.EmailConfirmed THEN 'EmailConfirmed actualizado de ' + CAST(d.EmailConfirmed AS NVARCHAR) + ' a ' + CAST(i.EmailConfirmed AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.Firstname <> d.Firstname 
+       OR i.Lastname <> d.Lastname
+       OR i.Email <> d.Email
+       OR i.DateOfBirth <> d.DateOfBirth
+       OR i.LastChanges <> d.LastChanges
+       OR i.EmailConfirmed <> d.EmailConfirmed;
+END;
+GO
+
+/*** ENTIDAD COURSE ASSIGNMENT ***/
+CREATE TRIGGER trgCourseAssignmentUpdate
+ON practica1.CourseAssignment
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[CourseAssignment updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.StudentId <> d.StudentId THEN 'StudentId actualizado de ' + CAST(d.StudentId AS NVARCHAR(36)) + ' a ' + CAST(i.StudentId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.CourseCodCourse <> d.CourseCodCourse THEN 'CourseCodCourse actualizado de ' + CAST(d.CourseCodCourse AS NVARCHAR) + ' a ' + CAST(i.CourseCodCourse AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.StudentId <> d.StudentId OR i.CourseCodCourse <> d.CourseCodCourse; 
+END;
+GO
+
+/*** ENTIDAD COURSE TUTOR ***/
+CREATE TRIGGER trgCourseTutorUpdate
+ON practica1.CourseTutor
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO practica1.HistoryLog (Date, Description)
+    SELECT 
+        GETDATE(), 
+        '[CourseTutor updated] Id: ' + CAST(i.Id AS NVARCHAR) + 
+        '. Cambios realizados: ' +
+        CASE WHEN i.TutorId <> d.TutorId THEN 'TutorId actualizado de ' + CAST(d.TutorId AS NVARCHAR(36)) + ' a ' + CAST(i.TutorId AS NVARCHAR(36)) + '. ' ELSE '' END +
+        CASE WHEN i.CourseCodCourse <> d.CourseCodCourse THEN 'CourseCodCourse actualizado de ' + CAST(d.CourseCodCourse AS NVARCHAR) + ' a ' + CAST(i.CourseCodCourse AS NVARCHAR) + '. ' ELSE '' END
+    FROM inserted i
+    INNER JOIN deleted d ON i.Id = d.Id
+    WHERE i.TutorId <> d.TutorId OR i.CourseCodCourse <> d.CourseCodCourse; -- Filtra solo si hubo cambios reales
+END;
+GO
