@@ -1,1 +1,1 @@
-{"resources":{"Procedures/PR1.sql":{"default-schema":"dbo","default-datasource":"microsoft-194fd909334-6ff963612bf72bc6","default-catalog":"master"},"Procedures/PR2.sql":{"default-schema":"dbo","default-datasource":"microsoft-194fd909334-6ff963612bf72bc6","default-catalog":"master"},"Procedures/PR3.sql":{"default-schema":"dbo","default-datasource":"microsoft-194fd909334-6ff963612bf72bc6","default-catalog":"master"}}}
+{"resources":{"Procedures/PR1.sql":{"default-datasource":"microsoft-194fd909334-6ff963612bf72bc6","default-catalog":"master","default-schema":"dbo"}}}

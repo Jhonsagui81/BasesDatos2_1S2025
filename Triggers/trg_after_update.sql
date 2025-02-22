@@ -1,3 +1,5 @@
+USE BD2;
+GO
 /*** ENTIDAD ROLES ***/
 
 CREATE TRIGGER trg_Roles_Update
@@ -13,7 +15,7 @@ BEGIN
         CASE WHEN i.RoleName <> d.RoleName THEN 'RoleName actualizado de ' + d.RoleName + ' a ' + i.RoleName + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.RoleName <> d.RoleName;
+    WHERE i.RoleName <> d.RoleName
 END;
 GO
 
@@ -33,7 +35,7 @@ BEGIN
         CASE WHEN i.CreditsRequired <> d.CreditsRequired THEN 'CreditsRequired actualizado de ' + CAST(d.CreditsRequired AS NVARCHAR) + ' a ' + CAST(i.CreditsRequired AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.CodCourse = d.CodCourse
-    WHERE i.Name <> d.Name OR i.CreditsRequired <> d.CreditsRequired; 
+    WHERE i.Name <> d.Name OR i.CreditsRequired <> d.CreditsRequired
 END;
 GO
 
@@ -53,7 +55,7 @@ BEGIN
         CASE WHEN i.Credits <> d.Credits THEN 'Credits actualizado de ' + CAST(d.Credits AS NVARCHAR) + ' a ' + CAST(i.Credits AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.UserId <> d.UserId OR i.Credits <> d.Credits; 
+    WHERE i.UserId <> d.UserId OR i.Credits <> d.Credits
 END;
 GO
 
