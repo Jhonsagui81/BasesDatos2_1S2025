@@ -1,31 +1,44 @@
-use [BD2];
-go
+USE [BD2];
+GO
 
-CREATE PROCEDURE PR5
+IF OBJECT_ID('dbo.PR5', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.PR5;
+GO
+
+CREATE PROCEDURE dbo.PR5
     @CodCourse INT,
     @Name VARCHAR(100),
     @CredistRequired INT
 AS
 BEGIN
-    BEGIN TRANSACTION;
+    SET NOCOUNT ON;
+
     BEGIN TRY
-        INSERT INTO practica1.Course(CodCourse, Name, CreditsRequired)
+        BEGIN TRANSACTION;
+
+        -- 1. Insertar el nuevo curso en la tabla practica1.Course
+        INSERT INTO practica1.Course (CodCourse, Name, CreditsRequired)
         VALUES (@CodCourse, @Name, @CredistRequired);
 
+        -- 2. Llamar a PR6 para validar los datos (si PR6 detecta algún error, lanzará una excepción)
+        EXEC practica1.PR6;
+
+        -- 3. Confirmar la transacción si la validación es exitosa
         COMMIT TRANSACTION;
 
-        INSERT INTO practica1.HistoryLog(Date, Description)
-        VALUES ( GETDATE(), 'PR5, Success');
+        -- 4. Registrar en HistoryLog el éxito de la operación
+        INSERT INTO practica1.HistoryLog (Date, Description)
+        VALUES (GETDATE(), 'PR5, Success');
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
 
-        INSERT INTO practica1.HistoryLog(Date, Description)
-        VALUES (GETDATE(), 'PR5, Failed');
+        INSERT INTO practica1.HistoryLog (Date, Description)
+        VALUES (GETDATE(), 'PR5, Failed: ' + ERROR_MESSAGE());
+
+        THROW;
     END CATCH
 END;
-go
-
-
-EXEC [dbo].[PR5] @CodCourse = 797, @Name = 'Seminario de Sistemas 1', @CredistRequired = 170;
 GO
+
