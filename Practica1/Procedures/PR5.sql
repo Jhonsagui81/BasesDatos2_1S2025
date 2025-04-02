@@ -1,11 +1,11 @@
 USE [BD2];
 GO
 
-IF OBJECT_ID('practica1.PR5', 'P') IS NOT NULL
-    DROP PROCEDURE practica1.PR5;
+IF OBJECT_ID('dbo.PR5', 'P') IS NOT NULL
+    DROP PROCEDURE dbo.PR5;
 GO
 
-CREATE PROCEDURE practica1.PR5
+CREATE PROCEDURE dbo.PR5
     @CodCourse INT,
     @Name VARCHAR(100),
     @CredistRequired INT
@@ -41,3 +41,4 @@ BEGIN
     END CATCH
 END;
 GO
+
