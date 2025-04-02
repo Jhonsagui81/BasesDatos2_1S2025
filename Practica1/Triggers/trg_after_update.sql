@@ -1,3 +1,5 @@
+USE BD2;
+GO
 /*** ENTIDAD ROLES ***/
 
 CREATE TRIGGER trg_Roles_Update
@@ -13,7 +15,7 @@ BEGIN
         CASE WHEN i.RoleName <> d.RoleName THEN 'RoleName actualizado de ' + d.RoleName + ' a ' + i.RoleName + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.RoleName <> d.RoleName;
+    WHERE i.RoleName <> d.RoleName
 END;
 GO
 
@@ -33,7 +35,7 @@ BEGIN
         CASE WHEN i.CreditsRequired <> d.CreditsRequired THEN 'CreditsRequired actualizado de ' + CAST(d.CreditsRequired AS NVARCHAR) + ' a ' + CAST(i.CreditsRequired AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.CodCourse = d.CodCourse
-    WHERE i.Name <> d.Name OR i.CreditsRequired <> d.CreditsRequired; 
+    WHERE i.Name <> d.Name OR i.CreditsRequired <> d.CreditsRequired
 END;
 GO
 
@@ -53,7 +55,7 @@ BEGIN
         CASE WHEN i.Credits <> d.Credits THEN 'Credits actualizado de ' + CAST(d.Credits AS NVARCHAR) + ' a ' + CAST(i.Credits AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.UserId <> d.UserId OR i.Credits <> d.Credits; 
+    WHERE i.UserId <> d.UserId OR i.Credits <> d.Credits
 END;
 GO
 
@@ -72,7 +74,7 @@ BEGIN
         CASE WHEN i.Message <> d.Message THEN 'Message actualizado de "' + d.Message + '" a "' + i.Message + '". ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.UserId <> d.UserId OR i.Message <> d.Message;
+    WHERE i.UserId <> d.UserId OR i.Message <> d.Message
 END;
 GO
 
@@ -93,7 +95,7 @@ BEGIN
         CASE WHEN i.LastUpdate <> d.LastUpdate THEN 'LastUpdate actualizado de ' + CAST(d.LastUpdate AS NVARCHAR) + ' a ' + CAST(i.LastUpdate AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.UserId <> d.UserId OR i.Status <> d.Status OR i.LastUpdate <> d.LastUpdate;
+    WHERE i.UserId <> d.UserId OR i.Status <> d.Status OR i.LastUpdate <> d.LastUpdate
 END;
 GO
 
@@ -113,14 +115,14 @@ BEGIN
         CASE WHEN i.TutorCode <> d.TutorCode THEN 'TutorCode actualizado de ' + d.TutorCode + ' a ' + i.TutorCode + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.UserId <> d.UserId OR i.TutorCode <> d.TutorCode;
+    WHERE i.UserId <> d.UserId OR i.TutorCode <> d.TutorCode
 END;
 GO
 
 
 /*** ENTIDAD USUARIO ROLE ***/
 CREATE TRIGGER trg_UsuarioRole_Update
-ON practica1.UsuarioRole
+ON practica1.UsuarioRole/media/jose/data/learning/USAC/SBD2/LAB/p1/script.sql
 AFTER UPDATE
 AS
 BEGIN
@@ -134,7 +136,7 @@ BEGIN
         CASE WHEN i.IsLatestVersion <> d.IsLatestVersion THEN 'IsLatestVersion actualizado de ' + CAST(d.IsLatestVersion AS NVARCHAR) + ' a ' + CAST(i.IsLatestVersion AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.RoleId <> d.RoleId OR i.UserId <> d.UserId OR i.IsLatestVersion <> d.IsLatestVersion;
+    WHERE i.RoleId <> d.RoleId OR i.UserId <> d.UserId OR i.IsLatestVersion <> d.IsLatestVersion
 END;
 GO
 
@@ -164,7 +166,7 @@ BEGIN
        OR i.DateOfBirth <> d.DateOfBirth
        OR i.LastChanges <> d.LastChanges
        OR i.EmailConfirmed <> d.EmailConfirmed
-       OR i.Password <> d.Password;
+       OR i.Password <> d.Password
 END;
 GO
 
@@ -183,7 +185,7 @@ BEGIN
         CASE WHEN i.CourseCodCourse <> d.CourseCodCourse THEN 'CourseCodCourse actualizado de ' + CAST(d.CourseCodCourse AS NVARCHAR) + ' a ' + CAST(i.CourseCodCourse AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.StudentId <> d.StudentId OR i.CourseCodCourse <> d.CourseCodCourse; 
+    WHERE i.StudentId <> d.StudentId OR i.CourseCodCourse <> d.CourseCodCourse
 END;
 GO
 
@@ -202,6 +204,6 @@ BEGIN
         CASE WHEN i.CourseCodCourse <> d.CourseCodCourse THEN 'CourseCodCourse actualizado de ' + CAST(d.CourseCodCourse AS NVARCHAR) + ' a ' + CAST(i.CourseCodCourse AS NVARCHAR) + '. ' ELSE '' END
     FROM inserted i
     INNER JOIN deleted d ON i.Id = d.Id
-    WHERE i.TutorId <> d.TutorId OR i.CourseCodCourse <> d.CourseCodCourse; -- Filtra solo si hubo cambios reales
+    WHERE i.TutorId <> d.TutorId OR i.CourseCodCourse <> d.CourseCodCourse -- Filtra solo si hubo cambios reales
 END;
 GO
