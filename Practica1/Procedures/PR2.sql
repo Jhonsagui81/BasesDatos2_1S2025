@@ -1,9 +1,10 @@
+----------------------------------PR2
 CREATE PROCEDURE [practica1].[PR2]
-    @Email NVARCHAR(MAX)
+    @Email NVARCHAR(MAX),
     @CodCourse INT
 AS
 BEGIN
-    BEGIN TRANSACTION 
+    BEGIN TRANSACTION; 
     BEGIN TRY
         DECLARE @UserId UNIQUEIDENTIFIER;
         DECLARE @EmailConfirmed BIT;
@@ -14,12 +15,16 @@ BEGIN
 
         IF @UserId IS NULL
         BEGIN
-            THROW 50000, 'El usuario no existe en el sistema.', 1;
+            RAISERROR('El usuario no existe en el sistema.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         IF @EmailConfirmed = 0
         BEGIN
-            THROW 50001, 'El usuario no tiene una cuenta activa.', 1;
+            RAISERROR('El usuario no tiene una cuenta activa.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
          -- Verificar que el usuario sea un student
@@ -32,7 +37,9 @@ BEGIN
             WHERE UserId = @UserId AND RoleId = @StudentRoleId
         )
         BEGIN
-            THROW 50002, 'El usuario no tiene el rol de Student.', 1;
+            RAISERROR('El usuario no tiene el rol de Student.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         -- Verificar que no sea tutor ya
@@ -45,21 +52,25 @@ BEGIN
             WHERE UserId = @UserId AND RoleId = @TutorRoleId
         )
         BEGIN
-            THROW 50003, 'El usuario ya es un tutor academico.', 1;
+            RAISERROR('El usuario ya tiene el rol de Tutor.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         -- Verificar que el curso existe en DB
         IF NOT EXISTS (
             SELECT 1
             FROM [practica1].[Course]
-            WHERE CodCourse = @CodCourse;
+            WHERE CodCourse = @CodCourse
         )
         BEGIN
-            THROW 50003, 'El curso que se pretende asignar no existe', 1;
+            RAISERROR('El curso especificado no existe.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         -- Insertar el nuevo rol del usuario 
-        INSERT INTO [practica1].[UsuarioRole] (RoleId, UserId, IsLatesVersion)
+        INSERT INTO [practica1].[UsuarioRole] (RoleId, UserId, IsLatestVersion)
         VALUES (@TutorRoleId, @UserId, 1);
 
         -- Crear perfil de tutor
@@ -89,8 +100,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-
-
-EXEC [practica1].[PR2]
-    @Email = 'juan.perez@example.com',
-    @CodCourse = 797; 

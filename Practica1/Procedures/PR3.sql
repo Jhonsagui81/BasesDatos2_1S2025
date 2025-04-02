@@ -1,5 +1,5 @@
-CREATE PROCEDURE PR3
-    @Email NVARCHAR(MAX)
+CREATE PROCEDURE [practica1].[PR3]
+    @Email NVARCHAR(MAX),
     @CodCourse INT
 AS
 BEGIN 
@@ -14,12 +14,16 @@ BEGIN
 
         IF @UserId IS NULL
         BEGIN
-            THROW 50000, 'El usuario no existe en el sistema.', 1;
+            RAISERROR('El usuario no existe en el sistema.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         IF @EmailConfirmed = 0
         BEGIN
-            THROW 50001, 'El usuario no tiene una cuenta activa.', 1;
+            RAISERROR('El usuario no tiene una cuenta activa.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
          -- Verificar que el usuario sea un student
@@ -32,7 +36,9 @@ BEGIN
             WHERE UserId = @UserId AND RoleId = @StudentRoleId
         )
         BEGIN
-            THROW 50002, 'El usuario no tiene el rol de Student.', 1;
+            RAISERROR('El usuario no tiene el rol de Student.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         -- Verificar que el curso existe en DB
@@ -40,10 +46,12 @@ BEGIN
         IF NOT EXISTS (
             SELECT 1
             FROM [practica1].[Course]
-            WHERE CodCourse = @CodCourse;
+            WHERE CodCourse = @CodCourse
         )
         BEGIN
-            THROW 50003, 'El curso que se pretende asignar no existe', 1;
+            RAISERROR('El curso especificado no existe.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         -- verificar que estudiante cumpla con creditos
@@ -53,9 +61,11 @@ BEGIN
         DECLARE @CourseCredits INT;
         SELECT @CourseCredits = CreditsRequired FROM [practica1].[Course] WHERE CodCourse = @CodCourse;
 
-        IF (@CreditsStudent < @CourseCreditsa)
+        IF (@CreditsStudent < @CourseCredits)
         BEGIN
-            THROW 50004, 'El estudiante no cuenta con los creditos necesarios para el este curso', 1;
+            RAISERROR('El estudiante no cumple con los créditos requeridos para el curso.', 16, 1);
+            ROLLBACK TRANSACTION;
+            RETURN;
         END
 
         -- Asignar estudiante al curso 
@@ -91,8 +101,3 @@ BEGIN
         THROW;
     END CATCH
 END;
-
-
-EXEC [practica1].[PR3]
-    @Email = 'juan.perez@example.com',
-    @CodCourse = 775; 
