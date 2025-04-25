@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  cassandra-node1:
+    build: ./cassandra
+    container_name: cassandra-node1
+    networks:
+      - cassandra-net
+    volumes:
+      - cassandra-data-node1:/var/lib/cassandra
+    environment:
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_CLUSTER_NAME=Proyecto1_Cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=dc1
+    ports:
+      - "9042:9042" # Puerto CQL
+
+  cassandra-node2:
+    build: ./cassandra
+    container_name: cassandra-node2
+    networks:
+      - cassandra-net
+    volumes:
+      - cassandra-data-node2:/var/lib/cassandra
+    environment:
+        - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+        - CASSANDRA_CLUSTER_NAME=Proyecto1_Cluster
+        - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+        - CASSANDRA_DC=dc1
+    depends_on:
+      - cassandra-node1
+
+  cassandra-node3:
+    build: ./cassandra
+    container_name: cassandra-node3
+    networks:
+      - cassandra-net
+    volumes:
+      - cassandra-data-node3:/var/lib/cassandra
+    environment:
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_CLUSTER_NAME=Proyecto1_Cluster
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - CASSANDRA_DC=dc1
+    depends_on:
+      - cassandra-node1
+
+  wait-for-cassandra:
+    image: busybox
+    container_name: wait-for-cassandra
+    networks:
+      - cassandra-net
+    command: sh -c "while ! nc -z cassandra-node1 9042; do sleep 10; done; echo 'Cassandra está listo'"
+    depends_on:
+      - cassandra-node1
+      - cassandra-node2
+      - cassandra-node3
+  
+  carga-masiva:
+    build: ./cassandra/scripts
+    container_name: carga-masiva
+    networks:
+      - cassandra-net
+    volumes:
+      - ./cassandra/scripts:/app
+    depends_on:
+      - wait-for-cassandra
+    command: sh -c "python /app/carga_masiva.py"
+networks:
+  cassandra-net:
+    driver: bridge
+
+volumes:
+  cassandra-data-node1:
+  cassandra-data-node2:
+  cassandra-data-node3:
