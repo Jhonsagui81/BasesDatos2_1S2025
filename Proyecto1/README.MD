@@ -175,10 +175,6 @@ CREATE TABLE proyecto_1.reservas_por_usuario (
     PRIMARY KEY ((id_usuario, fecha_mes), fecha, id_reserva)
 ) WITH CLUSTERING ORDER BY (fecha DESC, id_reserva DESC);
 
--- Historial de reservas de un usuario (usando la tabla reservas_por_usuario)
-SELECT * FROM reservas_por_usuario 
-WHERE id_usuario = ... AND fecha_mes = '2025-04';
-
 
 CREATE TABLE proyecto_1.reservas_por_espacio_fecha (
     id_espacio UUID,
@@ -249,17 +245,82 @@ WHERE
 PRIMARY KEY ((estado, id_espacio), fecha, hora_inicio)
 WITH CLUSTERING ORDER BY (fecha ASC, hora_inicio ASC);
 
--- Reservas canceladas en un espacio específico
-SELECT * FROM disponibilidad_por_estado 
-WHERE estado = 'cancelada' AND id_espacio = ...;
-
--- Consultar espacios disponibles el 2025-04-20
-SELECT * FROM disponibilidad_por_estado 
-WHERE estado = 'disponible' 
-AND id_espacio = [UUID]
-AND fecha = '2025-04-20';
-
 ```
+# INSERTCION DE DATOS
+Se utilizo un script de python para poder lograr la carga masiva de datos utilizando **BATCH WRITES**, el escrip esta conformado por las siguientes funciones:
+ - Insertar Usuarios:
+    Esta funcion prepara un query para insertar datos en la tabla usuarios en el cluster, con un ciclo for se le indica la cantidad de usuarios a insertar, los datos solo datos palabras quemadas con vareacon en los numeros. Se utiliza una lista para poder usarla en la la insersion de reservas, para poder asignarle un usuario a la reserva. 
+   ```python
+   def insert_usuarios(session, num=100):
+    usuarios = []
+    insert_user = session.prepare("""
+        INSERT INTO usuarios (id_usuario, nombre, email, dpi, telefono, nit_cf)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """)
+    for _ in range(num):
+        user_id = uuid.uuid4()
+        usuarios.append(user_id)
+        session.execute(insert_user, (
+            user_id,
+            f"Usuario {random.randint(1, 1000)}",
+            f"user{random.randint(1, 1000)}@mail.com",
+            str(random.randint(1000000000000, 9999999999999)),
+            f"5555-{random.randint(1000, 9999)}",
+            f"NIT-{random.randint(10000, 99999)}"
+        ))
+    return usuarios
+   ```
+- Insertar espacios:
+    Esta funcion tiene el mismo funcionamiento que la tabla anterior, prepara un query para insertar datos en la tabla espacios, con un ciclo for se insertar la cantidad de datos necesaria y se almacen en una lista para que al momento de insertar reserva se tenga acceso a espacios. 
+  ```python
+    def insert_espacios(session, num=50):
+    espacios = []
+    insert_space = session.prepare("""
+        INSERT INTO espacios (id_espacio, nombre, tipo, capacidad_maxima, ubicacion, estado)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """)
+    for _ in range(num):
+        espacio_id = uuid.uuid4()
+        espacios.append(espacio_id)
+        session.execute(insert_space, (
+            espacio_id,
+            f"Sala {random.choice(['A', 'B', 'C'])}-{random.randint(1, 100)}",
+            random.choice(["Conferencias", "Coworking", "Auditorio"]),
+            random.randint(10, 100),
+            f"Piso {random.randint(1, 5)}",
+            "disponible"
+        ))
+    return espacios
+  ```
+- Check Overlap: Lo que realiza esta funcon es verificar que no haya solapamiento de informacion, insertar reservas que ya estan ocupadas por otra reserva en esa fecha especifica.
+- Insertar Reservas: En esta funcion se prepararon querys para cada una de las tablas creadas para la reservas de espacios, se pasan los palametros que utilizara cada una de las funciones y se hace uso de **BatchStatement** para definir el consistency level que se utilizar para insertar los datos. 
+  ```python
+   batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+    batch.add(insert_space, params_space)
+    batch.add(insert_user, params_user)
+    batch.add(insert_date, params_date)
+    batch.add(insert_availability, params_availability)
 
+    try:
+        session.execute(batch)
+        return True
+    except Exception as e:
+        print(f"Error en BATCH: {e}")
+        return False
+  ```
+## CONSULTAS
 
-NOTA: en el scrip hay que hacer la modificacion del fecha mes para la tabla reserva por usuario
+### Disponibilidad de un espacio en una fecha
+- Para realizar esta consulta se utiliza la materialized view llamada **Consultar disponibilidad de un espacio en una fecha.** 
+    ```sql
+        SELECT id_espacio, fecha, hora_inicio, hora_fin, estado FROM disponibilidad_espacio  WHERE id_espacio = 9ae1bf97-c8bf-4ce4-aae2-ea539162beb2 AND fecha = '2025-10-16';
+    ```
+- Para ver historial de reservas de un usuario se utiliza la tabla llamada **reservas_por_usuario** a esta tabla utiliza como llave de particion el anio y el mes para poder mantener el rendimiento en las consultas, ya que si un usuario tiene miles de reservas cargarlas todas de golpe perjudicaria el rendimiento. 
+  ```sql
+    SELECT id_usuario, fecha,  id_reserva, id_espacio, nombre_reserva, hora_fin, estado  FROM reservas_por_usuario  WHERE id_usuario = cc777809-f610-4b75-b6f3-7b3ffe330a5b    AND fecha_mes = '2025-10' ORDER BY fecha DESC;
+  ```
+
+- Para ver Obtener ocupación de espacios en un rango de fechas. Se utilizo la tabla **reservas_por_fecha** 
+  ```sql
+    SELECT fecha, id_espacio, COUNT(*) AS total_reservas FROM proyecto_1.reservas_por_fecha WHERE fecha >= '2025-10-01'   AND fecha <= '2025-10-31'   AND id_espacio = 50c13cdb-a1ce-4e0f-ae7e-919ead0ba76a allow filtering;
+  ```
