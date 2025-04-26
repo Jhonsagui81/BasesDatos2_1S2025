@@ -3,7 +3,7 @@
 **Service**
 Aqui se definen los contenedores. los contenedores que se van a levantar, para este caso se necesitaran 3 nodos.
 1. **cassandra-node1**
-build: ./cassandra Le dice a Docker que construya la imagen usando el contexto y el Dockerfile ubicados en la carpeta ./cassandra. Esto permite personalizar la imagen de Cassandra si lo deseas.
+build: ./cassandra Le dice a Docker que construya la imagen usando el contexto y el Dockerfile ubicados en la carpeta ./cassandra. Esto permite personalizar la imagen de Cassandra.
 
     **container_name**: cassandra-node1 Establece el nombre del contenedor, facilitando la identificación y administración de este nodo.
 
@@ -42,13 +42,16 @@ Este Dockerfile se basa en Cassandra 4.1, copia un script personalizado de confi
 # COMANDOS
 Ejecurar docker compose
 ```bash
+#Para levantar 
 docker-compose up -d
+#Para construir
+docker-compose build
+#para eliminar contenedores actuales
+docker-compose down
 ```
 Verificar estado de cluster
 ```bash
 docker exec -it cassandra-node1 nodetool status #Deben estar los 3 levantados
-
-#Si estan los 3 nodos ejecutadonse pasar al siguiente paso
 ```
 Entrar la nodo1 para scribir CQL 
 ```bash
@@ -163,13 +166,18 @@ CREATE TABLE proyecto_1.espacios (
 CREATE TABLE proyecto_1.reservas_por_usuario (
     id_usuario UUID,
     fecha DATE,
+    fecha_mes TEXT,
     id_reserva TIMEUUID, 
     id_espacio UUID,
     nombre_reserva TEXT,
     hora_fin TIME,      
     estado TEXT,       
-    PRIMARY KEY ((id_usuario), fecha, id_reserva)
+    PRIMARY KEY ((id_usuario, fecha_mes), fecha, id_reserva)
 ) WITH CLUSTERING ORDER BY (fecha DESC, id_reserva DESC);
+
+-- Historial de reservas de un usuario (usando la tabla reservas_por_usuario)
+SELECT * FROM reservas_por_usuario 
+WHERE id_usuario = ... AND fecha_mes = '2025-04';
 
 
 CREATE TABLE proyecto_1.reservas_por_espacio_fecha (
@@ -195,6 +203,13 @@ CREATE TABLE proyecto_1.reservas_por_fecha (
     PRIMARY KEY ((fecha, id_espacio), hora_inicio, id_reserva)
 ) WITH CLUSTERING ORDER BY (hora_inicio ASC, id_reserva ASC);
 
+--Para mejorar datos temporales se agrega compactacion
+ALTER TABLE proyecto_1.reservas_por_fecha 
+WITH compaction = {
+    'class': 'TimeWindowCompactionStrategy',
+    'compaction_window_unit': 'DAYS',
+    'compaction_window_size': 1
+};
 
 
 CREATE TABLE proyecto_1.disponibilidad_espacio (
@@ -207,14 +222,44 @@ CREATE TABLE proyecto_1.disponibilidad_espacio (
     PRIMARY KEY ((id_espacio, fecha), hora_inicio, estado)  -- Incluir estado como clustering key
 ) WITH CLUSTERING ORDER BY (hora_inicio ASC, estado ASC);
 
-CREATE TABLE proyecto_1.reservas_por_estado (
-    estado TEXT,
-    id_reserva UUID,
-    id_espacio UUID,
-    id_usuario UUID,
-    fecha DATE,
-    hora_inicio TIMESTAMP,
-    hora_fin TIMESTAMP,
-    PRIMARY KEY ((estado), id_reserva)
-) WITH CLUSTERING ORDER BY (id_reserva ASC);
+
+ALTER TABLE proyecto_1.disponibilidad_espacio 
+WITH compaction = {
+    'class': 'TimeWindowCompactionStrategy',
+    'compaction_window_unit': 'HOURS',
+    'compaction_window_size': 6
+};
+
+
+--VISTA MATERIALIZADA para busqueda por estado
+CREATE MATERIALIZED VIEW proyecto_1.disponibilidad_por_estado AS
+SELECT 
+    id_espacio,
+    fecha,
+    hora_inicio,
+    hora_fin,
+    id_reserva,
+    estado
+FROM proyecto_1.disponibilidad_espacio
+WHERE 
+    estado IS NOT NULL 
+    AND id_espacio IS NOT NULL 
+    AND fecha IS NOT NULL 
+    AND hora_inicio IS NOT NULL
+PRIMARY KEY ((estado, id_espacio), fecha, hora_inicio)
+WITH CLUSTERING ORDER BY (fecha ASC, hora_inicio ASC);
+
+-- Reservas canceladas en un espacio específico
+SELECT * FROM disponibilidad_por_estado 
+WHERE estado = 'cancelada' AND id_espacio = ...;
+
+-- Consultar espacios disponibles el 2025-04-20
+SELECT * FROM disponibilidad_por_estado 
+WHERE estado = 'disponible' 
+AND id_espacio = [UUID]
+AND fecha = '2025-04-20';
+
 ```
+
+
+NOTA: en el scrip hay que hacer la modificacion del fecha mes para la tabla reserva por usuario

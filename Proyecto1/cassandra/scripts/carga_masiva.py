@@ -1,6 +1,6 @@
 from cassandra.cluster import Cluster
 from cassandra import ConsistencyLevel
-from cassandra.query import SimpleStatement
+from cassandra.query import SimpleStatement, BatchStatement
 import uuid
 from datetime import datetime, timedelta
 import random
@@ -66,70 +66,60 @@ def check_overlap(session, espacio_id, fecha, hora_inicio, hora_fin):
     return False
 
 def insert_reservation(session, usuario_id, espacio_id, fecha, hora_inicio, hora_fin, nombre_reserva):
-    """
-    Inserta la reserva en las cuatro tablas: reservas_por_espacio_fecha, reservas_por_usuario,
-    reservas_por_fecha y disponibilidad_espacio. Se utiliza el mismo id de reserva para todas.
-    """
-    reserva_id = uuid.uuid1()  # Genera un TIMEUUID basado en el tiempo actual.
+    reserva_id = uuid.uuid1()
+    fecha_mes = fecha.strftime('%Y-%m')
+    ttl_seconds = 604800  # 7 días
+
+    # Consultas preparadas individuales para cada INSERT
+    insert_space = session.prepare("""
+        INSERT INTO reservas_por_espacio_fecha (id_espacio, fecha, id_reserva, id_usuario, hora_inicio, hora_fin, estado)
+        VALUES (?, ?, ?, ?, ?, ?, ?) USING TTL ?
+    """)
     
-    insert_by_space = session.prepare("""
-        INSERT INTO reservas_por_espacio_fecha
-        (id_espacio, fecha, id_reserva, id_usuario, hora_inicio, hora_fin, estado)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+    insert_user = session.prepare("""
+        INSERT INTO reservas_por_usuario (id_usuario, fecha, fecha_mes, id_reserva, id_espacio, nombre_reserva, hora_fin, estado)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?) USING TTL ?
     """)
-    insert_by_user = session.prepare("""
-        INSERT INTO reservas_por_usuario
-        (id_usuario, fecha, id_reserva, id_espacio, nombre_reserva, hora_fin, estado)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+    
+    insert_date = session.prepare("""
+        INSERT INTO reservas_por_fecha (fecha, id_espacio, id_reserva, id_usuario, hora_inicio, hora_fin, estado)
+        VALUES (?, ?, ?, ?, ?, ?, ?) USING TTL ?
     """)
-    insert_by_fecha = session.prepare("""
-        INSERT INTO reservas_por_fecha
-        (fecha, id_espacio, id_reserva, id_usuario, hora_inicio, hora_fin, estado)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+    
+    insert_availability = session.prepare("""
+        INSERT INTO disponibilidad_espacio (id_espacio, fecha, hora_inicio, hora_fin, id_reserva, estado)
+        VALUES (?, ?, ?, ?, ?, ?) USING TTL ?
     """)
-    insert_disponibilidad = session.prepare("""
-        INSERT INTO disponibilidad_espacio
-        (id_espacio, fecha, hora_inicio, hora_fin, id_reserva)
-        VALUES (?, ?, ?, ?, ?)
-    """)
+
+    # Parámetros para cada inserción
+    params_space = (
+        espacio_id, fecha, reserva_id, usuario_id, hora_inicio, hora_fin, "activa", ttl_seconds
+    )
+    
+    params_user = (
+        usuario_id, fecha, fecha_mes, reserva_id, espacio_id, nombre_reserva, hora_fin.time(), "activa", ttl_seconds
+    )
+    
+    params_date = (
+        fecha, espacio_id, reserva_id, usuario_id, hora_inicio, hora_fin, "activa", ttl_seconds
+    )
+    
+    params_availability = (
+        espacio_id, fecha, hora_inicio, hora_fin, reserva_id, "activa", ttl_seconds
+    )
+
+    # Crear BatchStatement y agregar las inserciones
+    batch = BatchStatement(consistency_level=ConsistencyLevel.QUORUM)
+    batch.add(insert_space, params_space)
+    batch.add(insert_user, params_user)
+    batch.add(insert_date, params_date)
+    batch.add(insert_availability, params_availability)
+
     try:
-        session.execute(insert_by_space, (
-            espacio_id,
-            fecha,
-            reserva_id,
-            usuario_id,
-            hora_inicio,
-            hora_fin,
-            "activa"
-        ))
-        session.execute(insert_by_user, (
-            usuario_id,
-            fecha,
-            reserva_id,
-            espacio_id,
-            nombre_reserva,
-            hora_fin.time(),
-            "activa"
-        ))
-        session.execute(insert_by_fecha, (
-            fecha,
-            espacio_id,
-            reserva_id,
-            usuario_id,
-            hora_inicio,
-            hora_fin,
-            "activa"
-        ))
-        session.execute(insert_disponibilidad, (
-            espacio_id,
-            fecha,
-            hora_inicio,
-            hora_fin,
-            reserva_id
-        ))
+        session.execute(batch)
         return True
     except Exception as e:
-        print(f"Error insertando reserva: {e}")
+        print(f"Error en BATCH: {e}")
         return False
 
 def main():
@@ -139,15 +129,15 @@ def main():
     session = cluster.connect("proyecto_1")
     
     # Inserción de usuarios y espacios.
-    usuarios = insert_usuarios(session, num=100)
-    espacios = insert_espacios(session, num=50)
+    usuarios = insert_usuarios(session, num=10000)
+    espacios = insert_espacios(session, num=5000)
     print("Usuarios y espacios insertados.")
     
     # Espera corta para garantizar que las inserciones anteriores se propagaron.
     time.sleep(5)
     
     # Insertar reservas: en este ejemplo se intentan insertar 100 reservas.
-    num_reservas = 100  # Puedes escalar este número según lo necesites.
+    num_reservas = 100000  # Puedes escalar este número según lo necesites.
     for i in range(num_reservas):
         usuario_id = random.choice(usuarios)
         espacio_id = random.choice(espacios)
