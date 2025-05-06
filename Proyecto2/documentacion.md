@@ -3,9 +3,13 @@
 ## Universidad de San Carlos de Guatemala
 
 **Facultad de Ingeniería**
+
 **Escuela de Ciencias y Sistemas**
+
 **Curso: Sistemas de Bases de Datos 2 – 1er Semestre 2025**
+
 **Docente: Ing. Otto Amílcar Rodríguez Acosta**
+
 **Auxiliar: Emiliano José Alexander Velásquez Najera**
 
 Repositorio del proyecto:
