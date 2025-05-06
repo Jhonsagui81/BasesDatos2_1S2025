@@ -1,0 +1,28 @@
+{
+    "Pacientes": {
+        "idPaciente": "int",
+        "edad": "int",
+        "genero": "string"
+    },
+    "Habitaciones": {
+        "idHabitacion": "int",
+        "habitacion": "string"
+    },
+    "LogHabitacion": {
+        "idHabitacion": "int",
+        "timestamp": "datetime",
+        "status": "string"
+    },
+    "LogActividades1": {
+        "timestamp": "datetime",
+        "actividad": "string",
+        "idHabitacion": "int",
+        "idPaciente": "int"
+    },
+    "LogActividades2": {
+        "timestamp": "datetime",
+        "actividad": "string",
+        "idHabitacion": "int",
+        "idPaciente": "int"
+    }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Consultas a Motor de Base de Datos</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Ejecutor de Consultas</h1>
+
+      <label for="engineSelect">Seleccione motor:</label>
+      <select id="engineSelect">
+        <option value="mysql">MySQL</option>
+        <option value="mongodb">MongoDB</option>
+      </select>
+
+      <div class="button-group">
+        <button data-query-id="1">1</button>
+        <button data-query-id="2">2</button>
+        <button data-query-id="3">3</button>
+        <button data-query-id="4">4</button>
+        <button data-query-id="5">5</button>
+        <button data-query-id="6">6</button>
+        <button data-query-id="7">7</button>
+        <button data-query-id="8">8</button>
+      </div>
+
+      <div id="output" class="output">
+        <p><strong>Tiempo de ejecución:</strong> <span id="time"></span></p>
+        <pre id="resultJson"></pre>
+      </div>
+    </div>
+
+    <script src="main.js"></script>
+  </body>
+</html>
